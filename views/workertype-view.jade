@@ -23,6 +23,12 @@ block content
         |  Edit
       = ' '
       a(
+        href="/worker-type/#{workerType.workerType}/on-demand"
+      ).btn.btn-danger.btn-sm.prompt-first
+        i.glyphicon.glyphicon-play
+        |  Start Ondemand
+      = ' '
+      a(
         href="/worker-type/#{workerType.workerType}/delete"
       ).btn.btn-danger.btn-sm.prompt-first
         i.glyphicon.glyphicon-trash

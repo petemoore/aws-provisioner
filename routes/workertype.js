@@ -5,6 +5,8 @@ var amqp        = require('../provisioner/amqp');
 var WorkerType  = require('../provisioner/data').WorkerType;
 var aws         = require('aws-sdk');
 var nconf       = require('nconf');
+var _           = require('lodash');
+
 
 // Create ec2 service object
 var ec2 = exports.ec2 = new aws.EC2();
@@ -52,6 +54,25 @@ exports.edit = function(req, res){
     title:          "Edit " + wType.workerType,
     workerType:     wType
   });
+};
+
+/** Create on-demand instance */
+exports.onDemand = function(req, res) {
+  var wType = state.get().filter(function(wType) {
+    return wType.workerType == req.params.workerType;
+  })[0] || null;
+  if (!wType) {
+    return next();
+  }
+
+  ec2.runInstances(_.default({
+    KeyName:      nconf.get('provisioner:keyNamePrefix') + wType.workerType,
+    InstanceInitiatedShutdownBehavior: 'terminate',
+    MaxCount: 1,
+    MinCount: 0
+  }, wType.configuration.launchSpecification)).promise();
+
+  res.json({"did": "requested something..."});
 };
 
 /** Delete existing workerType */

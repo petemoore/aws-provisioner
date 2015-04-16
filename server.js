@@ -111,6 +111,7 @@ app.get('/worker-type',                   ensureAuthenticated,  routes.workertyp
 app.get('/worker-type/create',            ensureAuthenticated,  routes.workertype.create);
 app.get('/worker-type/:workerType/view',  ensureAuthenticated,  routes.workertype.view);
 app.get('/worker-type/:workerType/edit',  ensureAuthenticated,  routes.workertype.edit);
+app.get('/worker-type/:workerType/on-demand',  ensureAuthenticated,  routes.workertype.onDemand);
 app.get('/worker-type/:workerType/delete',ensureAuthenticated,  routes.workertype.delete);
 app.post('/worker-type/update',           ensureAuthenticated,  routes.workertype.update)
 
