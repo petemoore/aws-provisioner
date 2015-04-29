@@ -108,7 +108,6 @@ exports.update = function(req, res){
       if (wType) {
         throw new Error("WorkerType " + wType.workerType + " already exists");
       }
-      console.log('create the thing!?', req.body, '<<<!');
       var workerType = req.body.workerType;
       var keyName = nconf.get('provisioner:keyNamePrefix') + workerType;
       return ec2.importKeyPair({
@@ -132,12 +131,23 @@ exports.update = function(req, res){
 
     // Update WorkerType if requested
     if (req.body.updateOrCreate == 'update') {
-      return wType.modify(function() {
-        this.configuration.bindQueue            = (req.body.bindQueue ? true : false);
-        this.configuration.launchSpecification  = launchSpecification;
-        this.configuration.maxInstances         = parseInt(req.body.maxInstances);
-        this.configuration.spotBid              = req.body.spotBid;
-      });
+      // Terrible
+      function modify() {
+        console.log('Updating worker type!');
+        return wType.modify(function() {
+          this.configuration.bindQueue            = (req.body.bindQueue ? true : false);
+          this.configuration.launchSpecification  = launchSpecification;
+          this.configuration.maxInstances         = parseInt(req.body.maxInstances);
+          this.configuration.spotBid              = req.body.spotBid;
+        });
+      }
+      var workerType = req.body.workerType;
+      var keyName = nconf.get('provisioner:keyNamePrefix') + workerType;
+      console.log('updating key pair', workerType, keyName);
+      return ec2.importKeyPair({
+        KeyName:                keyName,
+        PublicKeyMaterial:      nconf.get('provisioner:publicKeyData')
+      }).promise().then(modify).catch(modify);
     }
   }).then(function() {
     if (req.body.bindQueue) {
